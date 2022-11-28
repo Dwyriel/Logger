@@ -1,5 +1,6 @@
 #include "logger.h"
 
 int main(){
-    Logger::LogError("Hello");
+    const char l[] = "Hello";
+    Logger::LogInfo(l);
 }
