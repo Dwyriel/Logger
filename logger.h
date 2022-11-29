@@ -18,6 +18,7 @@ class Logger {
     };
 
     inline static std::string _outputFile;
+    inline static bool _logTime = true;
 
     static std::string GetLocalTime() {
         std::time_t t = std::time(nullptr);
@@ -28,7 +29,7 @@ class Logger {
 
     template<typename T>
     static void Log(const Logger::LogLevel &logLevel, T const &log_text) {
-        std::string_view prefix, color;
+        std::string_view prefix, color, separator;
         switch (logLevel) {
             case LogLevel::ErrorLog:
                 color = RED;
@@ -45,8 +46,13 @@ class Logger {
             default:
                 return;
         }
+        std::string timeAndDate;
+        if(_logTime) {
+            timeAndDate = GetLocalTime();
+            separator = SEPARATOR;
+        }
         std::stringstream log_message;
-        log_message << prefix << GetLocalTime() << SEPARATOR << log_text;
+        log_message << prefix << timeAndDate << separator << log_text;
         WriteToConsole(color, log_message.str());
         if (_outputFile.empty())
             return;
@@ -90,6 +96,18 @@ public:
 
     static std::string_view GetOutputFile() noexcept {
         return _outputFile;
+    }
+
+    static void EnableTimeLogging(){
+        _logTime = true;
+    }
+
+    static void DisableTimeLogging(){
+        _logTime = false;
+    }
+
+    static bool isLoggingTime(){
+        return _logTime;
     }
 
     template<typename T>
