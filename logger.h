@@ -5,6 +5,8 @@
 #include <string>
 #include <string_view>
 #include <filesystem>
+#include <ctime>
+#include <sstream>
 
 class Logger {
     inline static const std::string_view RED = "\033[38;5;196m", ORANGE = "\033[38;5;220m", WHITE = "\033[38;5;252m", RESET = "\033[0m";
@@ -16,6 +18,13 @@ class Logger {
     };
 
     inline static std::string _outputFile;
+
+    static std::string GetLocalTime() {
+        std::time_t t = std::time(nullptr);
+        std::stringstream ss;
+        ss << std::put_time(localtime(&t), "%H:%M:%S %d/%m/%Y");
+        return ss.str();
+    }
 
     template<typename T>
     static void Log(const Logger::LogLevel &logLevel, T const &log_text) {
@@ -36,18 +45,19 @@ class Logger {
             default:
                 return;
         }
-        WriteToConsole(color, prefix, log_text);
+        std::stringstream log_message;
+        log_message << prefix << GetLocalTime() << SEPARATOR << log_text;
+        WriteToConsole(color, log_message.str());
         if (_outputFile.empty())
             return;
-        WriteToFile();
+        WriteToFile(log_message.str());
     }
 
-    template<typename T>
-    static void WriteToConsole(const std::string_view &color, const std::string_view &prefix, T const &log_text) {
-        std::cout << color << prefix << log_text << RESET << END_LINE;
+    static void WriteToConsole(const std::string_view &color, const std::string_view &log_message) {
+        std::cout << color << log_message << RESET << END_LINE;
     }
 
-    static void WriteToFile() {}//todo writing to a file;
+    static void WriteToFile(const std::string_view &log_message) {}//todo writing to a file;
 
 public:
     Logger() = delete;
