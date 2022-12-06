@@ -7,6 +7,7 @@
 #include <filesystem>
 #include <ctime>
 #include <sstream>
+#include <fstream>
 
 class Logger {
     inline static const std::string_view RED = "\033[38;5;196m", ORANGE = "\033[38;5;220m", WHITE = "\033[38;5;252m", RESET = "\033[0m";
@@ -54,16 +55,24 @@ class Logger {
         std::stringstream log_message;
         log_message << prefix << timeAndDate << separator << log_text;
         WriteToConsole(color, log_message.str());
-        if (_outputFile.empty())
-            return;
-        WriteToFile(log_message.str());
+        if (!_outputFile.empty())
+            WriteToFile(log_message.str());
     }
 
     static void WriteToConsole(const std::string_view &color, const std::string_view &log_message) {
         std::cout << color << log_message << RESET << END_LINE;
     }
 
-    static void WriteToFile(const std::string_view &log_message) {}//todo writing to a file;
+    static void WriteToFile(const std::string_view &log_message) {
+        std::ofstream writeFile(_outputFile, std::ios::app);
+        if(!writeFile || !writeFile.is_open()){
+            LogError("Logger could not save to file");
+            _outputFile = "";
+            return;
+        }
+        writeFile << log_message << END_LINE;
+        writeFile.close();
+    }
 
 public:
     Logger() = delete;
