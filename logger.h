@@ -79,6 +79,8 @@ public:
 
     ~Logger() = delete;
 
+    Logger operator=(const Logger& logger) = delete;
+
     /**
      * <br>Sets the output file full path.<br><br>
      * If output file is set and is valid, logging to file will automatically be done.<br>
