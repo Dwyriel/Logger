@@ -1,3 +1,3 @@
 # Logger
 A simple C++ Logger<br>
-Requisers C++17
+Requires C++17
